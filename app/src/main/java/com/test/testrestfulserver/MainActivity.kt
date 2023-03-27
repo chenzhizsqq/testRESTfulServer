@@ -42,6 +42,10 @@ class MainActivity : AppCompatActivity() {
             }
             flowViewModel()
         }
+        binding.btPost1.setOnClickListener {
+            binding.tvAnswer.text = "NG"
+            restfulFlowViewModelPost()
+        }
     }
 
     private fun flowViewModel() {
@@ -73,5 +77,36 @@ class MainActivity : AppCompatActivity() {
             .addConverterFactory(GsonConverterFactory.create()) //把json转为gson，才可以直接用LiveData.postValue
             .build()
         return retrofit.create(TestFlowService::class.java)
+    }
+
+    private fun restfulFlowService(): FlowService? {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://192.168.1.3:8080/")
+            .addConverterFactory(GsonConverterFactory.create()) //把json转为gson，才可以直接用LiveData.postValue
+            .build()
+        return retrofit.create(FlowService::class.java)
+    }
+
+    private fun restfulFlowViewModelPost() {
+        runBlocking {
+            flow {
+                val service = restfulFlowService()
+                val response = service?.getFlowGson()
+                emit(response)
+            }
+                .onStart { Log.e(TAG, "flowViewModel: Starting flow") }
+                .onEach {
+                    Log.e(TAG, "flowViewModel: onEach : $it")
+//                    if (it != null) {
+//                        viewModel.testFlowDataList.value = it
+//                        binding.tvAnswer.text = it.toString()
+//                    }
+                }
+                .catch {
+                    Log.e(TAG, "flowViewModel: !!! catch : "+it.message )
+                }
+                .onCompletion { if (it == null) Log.e(TAG, "Completed successfully") }
+                .collect()
+        }
     }
 }
