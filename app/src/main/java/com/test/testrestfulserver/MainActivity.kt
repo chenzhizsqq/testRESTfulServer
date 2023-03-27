@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         //绑定
         binding.viewModel = viewModel
 
-        binding.btPost.setOnClickListener {
+        binding.btPostDemo.setOnClickListener {
             binding.tvAnswer.text = "NG"
             viewModel.testFlowDataList.observe(binding.lifecycleOwner as MainActivity) {
                 if (it != null) {
