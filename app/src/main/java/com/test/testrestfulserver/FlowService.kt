@@ -1,5 +1,6 @@
 package com.test.testrestfulserver
 
+import retrofit2.Response
 import retrofit2.http.GET
 
 interface FlowService {
@@ -16,7 +17,7 @@ interface FlowService {
 
 
     @GET("/api/v1/employees")
-    suspend fun getFlowGson(): GetFlowData
+    suspend fun getFlowGson(): Response<GetFlowData>
 
 
     companion object {

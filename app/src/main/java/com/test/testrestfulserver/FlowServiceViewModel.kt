@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 /**
  * 对应的ViewModel
  */
-class TestFlowViewModel : ViewModel() {
-    //专门对应json数据中的TestFlowData数据List
-    var testFlowDataList = MutableLiveData<List<TestFlowData>>()
+class FlowServiceViewModel : ViewModel() {
+    var getFlowData = MutableLiveData<GetFlowData>()
 }

@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 
     // Obtain ViewModel from ViewModelProviders
     private val viewModel by lazy {
-        ViewModelProvider(this)[TestFlowViewModel::class.java]
+        ViewModelProvider(this)[FlowServiceViewModel::class.java]
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,50 +33,15 @@ class MainActivity : AppCompatActivity() {
         //绑定
         binding.viewModel = viewModel
 
-        binding.btPostDemo.setOnClickListener {
+        binding.btGetAllFlowData.setOnClickListener {
             binding.tvAnswer.text = "NG"
-            viewModel.testFlowDataList.observe(binding.lifecycleOwner as MainActivity) {
-                if (it != null) {
-                    Toast.makeText(baseContext, "" + it, Toast.LENGTH_SHORT).show()
+            viewModel.getFlowData.observeForever {
+                if (it !=null){
+                    binding.tvAnswer.text = it.toString()
                 }
             }
-            flowViewModel()
+            restfulFlowViewModelGetAll()
         }
-        binding.btPost1.setOnClickListener {
-            binding.tvAnswer.text = "NG"
-            restfulFlowViewModelPost()
-        }
-    }
-
-    private fun flowViewModel() {
-        runBlocking {
-            flow {
-                val service = testFlowService()
-                val response = service?.getFlowGson()
-                emit(response)
-            }
-                .onStart { Log.e(TAG, "flowViewModel: Starting flow") }
-                .onEach {
-                    Log.e(TAG, "flowViewModel: onEach : $it")
-                    if (it != null) {
-                        viewModel.testFlowDataList.value = it
-                        binding.tvAnswer.text = it.toString()
-                    }
-                }
-                .catch {
-                    Log.e(TAG, "flowViewModel: it.message : "+it.message )
-                }
-                .onCompletion { if (it == null) Log.e(TAG, "Completed successfully") }
-                .collect()
-        }
-    }
-
-    private fun testFlowService(): TestFlowService? {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://my-json-server.typicode.com/")
-            .addConverterFactory(GsonConverterFactory.create()) //把json转为gson，才可以直接用LiveData.postValue
-            .build()
-        return retrofit.create(TestFlowService::class.java)
     }
 
     private fun restfulFlowService(): FlowService? {
@@ -87,25 +52,38 @@ class MainActivity : AppCompatActivity() {
         return retrofit.create(FlowService::class.java)
     }
 
-    private fun restfulFlowViewModelPost() {
+    private fun restfulFlowViewModelGetAll() {
         runBlocking {
             flow {
                 val service = restfulFlowService()
                 val response = service?.getFlowGson()
-                emit(response)
+                if (response?.isSuccessful == true) {
+                    Log.e(TAG, "" + response.code())
+                    Toast.makeText(baseContext, "" + response?.code(), Toast.LENGTH_SHORT)
+                        .show()
+                    emit(response?.body())
+                } else {
+                    if (response != null) {
+                        Log.e(TAG, "" + response.code())
+                    }
+                    Toast.makeText(baseContext, "" + response?.code(), Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
                 .onStart { Log.e(TAG, "flowViewModel: Starting flow") }
                 .onEach {
                     Log.e(TAG, "flowViewModel: onEach : $it")
-//                    if (it != null) {
-//                        viewModel.testFlowDataList.value = it
-//                        binding.tvAnswer.text = it.toString()
-//                    }
+                    if (it != null) {
+                        viewModel.getFlowData.value = it
+                    }
                 }
                 .catch {
                     Log.e(TAG, "flowViewModel: !!! catch : "+it.message )
+                    binding.tvAnswer.text = it.toString()
                 }
-                .onCompletion { if (it == null) Log.e(TAG, "Completed successfully") }
+                .onCompletion {
+                    Log.e(TAG, "onCompletion")
+                }
                 .collect()
         }
     }

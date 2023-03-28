@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.test.testrestfulserver.TestFlowViewModel" />
+            type="com.test.testrestfulserver.FlowServiceViewModel" />
     </data>
 
 
@@ -29,17 +29,8 @@
                 android:textSize="20dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Post Demo"
-                android:id="@+id/bt_post_demo"
-                />
-            <Button
-                android:padding="10dp"
-                android:layout_margin="10dp"
-                android:textSize="20dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Post 1"
-                android:id="@+id/bt_post_1"
+                android:text="Get ALL Flow Data"
+                android:id="@+id/bt_get_all_flow_data"
                 />
             <TextView
                 android:padding="10dp"
